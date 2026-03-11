@@ -1,0 +1,42 @@
+## =============================================================================
+## IDF Component: rodrigo-s-lange/esp_at
+## Registry:      https://components.espressif.com/components/rodrigo-s-lange/esp_at
+## Repository:    https://github.com/rodrigo-s-lange/esp-at
+## =============================================================================
+##
+## STANDALONE — sem dependências internas de projeto.
+##
+## Compatível com: esp32 | esp32-c3 | esp32-c6 | esp32-s3
+##
+## Para usar em outro projeto:
+##   Via registry:  idf.py add-dependency "rodrigo-s-lange/esp_at>=1.0.0"
+##   Via submodule: git submodule add https://github.com/rodrigo-s-lange/esp-at.git components/esp_at
+##
+## No código:
+##   #include "esp_at.h"
+##   esp_at_init();
+##   esp_at_register_cmd("AT+CMD", handler);
+## =============================================================================
+
+version: "1.0.0"
+
+description: >
+  AT command parser over UART0 with ANSI color output, local echo,
+  backspace support and dynamic thread-safe command registration.
+  Color tokens (G Y R B W O P C M K) via compile-time string concatenation —
+  zero runtime overhead. Compatible with the full ESP32 family.
+
+url: "https://github.com/rodrigo-s-lange/esp-at"
+repository: "https://github.com/rodrigo-s-lange/esp-at.git"
+
+license: "MIT"
+
+targets:
+  - esp32
+  - esp32c3
+  - esp32c6
+  - esp32s3
+
+dependencies:
+  idf:
+    version: ">=5.0.0"
