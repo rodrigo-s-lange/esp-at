@@ -1,7 +1,7 @@
 ## =============================================================================
 ## IDF Component: rodrigo-s-lange/esp_at
 ## Registry:      https://components.espressif.com/components/rodrigo-s-lange/esp_at
-## Repository:    https://github.com/rodrigo-s-lange/esp-at
+## Repository:    https://github.com/rodrigo-s-lange/esp_at
 ## =============================================================================
 ##
 ## STANDALONE — sem dependências internas de projeto.
@@ -10,7 +10,7 @@
 ##
 ## Para usar em outro projeto:
 ##   Via registry:  idf.py add-dependency "rodrigo-s-lange/esp_at>=1.0.0"
-##   Via submodule: git submodule add https://github.com/rodrigo-s-lange/esp-at.git components/esp_at
+##   Via submodule: git submodule add https://github.com/rodrigo-s-lange/esp_at.git components/esp_at
 ##
 ## No código:
 ##   #include "esp_at.h"
@@ -26,8 +26,8 @@ description: >
   Color tokens (G Y R B W O P C M K) via compile-time string concatenation —
   zero runtime overhead. Compatible with the full ESP32 family.
 
-url: "https://github.com/rodrigo-s-lange/esp-at"
-repository: "https://github.com/rodrigo-s-lange/esp-at.git"
+url: "https://github.com/rodrigo-s-lange/esp_at"
+repository: "https://github.com/rodrigo-s-lange/esp_at.git"
 
 license: "MIT"
 
