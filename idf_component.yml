@@ -18,7 +18,7 @@
 ##   esp_at_register_cmd("AT+CMD", handler);
 ## =============================================================================
 
-version: "1.0.0"
+version: "0.1.0"
 
 description: >
   AT command parser over UART0 with ANSI color output, local echo,
