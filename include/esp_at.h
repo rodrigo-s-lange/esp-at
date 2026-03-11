@@ -32,7 +32,7 @@
  *          nas unidades de compilação que incluem este header.
  *
  * @par Repositório
- *   https://github.com/rodrigo-s-lange/esp_at
+ *   https://github.com/rodrigo-s-lange/esp-at
  *
  * @par Registry
  *   rodrigo-s-lange/esp_at

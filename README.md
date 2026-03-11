@@ -63,7 +63,7 @@ idf.py add-dependency "rodrigo-s-lange/esp_at>=1.0.0"
 Or as git submodule:
 
 ```bash
-git submodule add https://github.com/rodrigo-s-lange/esp_at.git components/esp_at
+git submodule add https://github.com/rodrigo-s-lange/esp-at.git components/esp_at
 ```
 
 ## License
