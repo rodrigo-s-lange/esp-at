@@ -32,6 +32,7 @@ void handle_temp(const char *param) {
 // Output anywhere, any task:
 AT(G "OK");
 AT_I(C "Sistema iniciado — heap: %lu", esp_get_free_heap_size());
+AT(B "millis = " W "%llu" B " microseconds", esp_timer_get_time() / 1000);
 ```
 
 ## Built-in commands

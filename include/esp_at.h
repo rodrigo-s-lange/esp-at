@@ -156,6 +156,7 @@ esp_err_t esp_at_register_cmd(const char *cmd, at_handler_t handler);
  *
  * @code
  *   AT(G "tensão: " Y "%.2f" W " V", tensao);
+ *   AT(B "millis = " W "%llu" B " microseconds", esp_timer_get_time() / 1000);
  * @endcode
  *
  * @param[in] fmt  String de formato printf-style (pode conter tokens de cor).
