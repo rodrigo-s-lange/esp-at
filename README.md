@@ -44,6 +44,13 @@ AT(B "millis = " W "%llu" B " microseconds", esp_timer_get_time() / 1000);
 | `AT+VER` / `AT+VERSION` | Firmware + IDF version |
 | `AT+RESET` / `AT+REBOOT` | Restart chip |
 
+## More examples
+
+- See `EXAMPLES.md` for practical `app_main` examples:
+  - `esp_at_add("HW", cb)` for simple callbacks
+  - `AT+SETPOINT=25` with `esp_at_register_cmd(...)`
+  - `AT+MILLIS` and output/log patterns
+
 ## Color tokens
 
 ```c

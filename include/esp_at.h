@@ -27,9 +27,9 @@
  * @note Thread-safe: AT(), at(), AT_I/W/E/D() e esp_at_register_cmd()
  *       podem ser chamados de qualquer task após esp_at_init().
  *
- * @warning Os tokens de cor são macros de string literal de uma letra
- *          (G, Y, R …). Evite usar esses nomes como variáveis locais
- *          nas unidades de compilação que incluem este header.
+ * @warning Os tokens de cor são macros de string literal de uma letra maiúscula
+ *          (G, Y, R, B, W, O, P, C, M, K). Evite usar esses nomes como
+ *          variáveis locais nas unidades de compilação que incluem este header.
  *
  * @par Repositório
  *   https://github.com/rodrigo-s-lange/esp-at
@@ -66,25 +66,15 @@ extern "C" {
  * @endcode
  */
 #define G  "\033[32m"           /**< Green   (verde)        */
-#define g  "\033[32m"
 #define Y  "\033[33m"           /**< Yellow  (amarelo)      */
-#define y  "\033[33m"
 #define R  "\033[31m"           /**< Red     (vermelho)     */
-#define r  "\033[31m"
 #define B  "\033[34m"           /**< Blue    (azul)         */
-#define b  "\033[34m"
 #define W  "\033[0m"            /**< White / Reset          */
-#define w  "\033[0m"
 #define O  "\033[38;5;208m"     /**< Orange  (laranja)      */
-#define o  "\033[38;5;208m"
 #define P  "\033[35m"           /**< Purple  (roxo)         */
-#define p  "\033[35m"
 #define C  "\033[36m"           /**< Cyan    (ciano)        */
-#define c  "\033[36m"
 #define M  "\033[95m"           /**< Magenta (magenta)      */
-#define m  "\033[95m"
 #define K  "\033[38;5;213m"     /**< Pink    (rosa)  — K de pinK */
-#define k  "\033[38;5;213m"
 /** @} */
 
 /* ======================================================================== */
@@ -101,6 +91,20 @@ extern "C" {
  * nem chamar APIs que dependam de outras tasks com prioridade menor.
  */
 typedef void (*at_handler_t)(const char *param);
+
+/**
+ * @brief Prototipo simplificado para comandos AT sem parametro.
+ */
+typedef void (*esp_at_simple_handler_t)(void);
+
+/**
+ * @brief Callback para espelhar a saida do terminal AT em outros transportes.
+ *
+ * @param[in] data  Buffer transmitido (nao necessariamente terminado em '\0').
+ * @param[in] len   Tamanho do buffer em bytes.
+ * @param[in] ctx   Contexto de usuario fornecido no registro do sink.
+ */
+typedef void (*esp_at_output_sink_t)(const char *data, size_t len, void *ctx);
 
 /* ======================================================================== */
 /* Inicialização                                                             */
@@ -146,6 +150,53 @@ esp_err_t esp_at_init(void);
  * @return ESP_ERR_INVALID_STATE esp_at_init() não foi chamado.
  */
 esp_err_t esp_at_register_cmd(const char *cmd, at_handler_t handler);
+
+/**
+ * @brief Registra comando no formato simplificado "AT+<suffix>".
+ *
+ * Exemplo:
+ * @code
+ *   static void func_helloworld(void) { AT(B "hello world"); }
+ *   esp_at_add("HW", func_helloworld); // comando: AT+HW
+ * @endcode
+ *
+ * @param[in] suffix  Sufixo do comando sem "AT+" (ex: "HW").
+ *                    Tambem aceita comando completo (ex: "AT+HW").
+ * @param[in] handler Callback sem parametros.
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_at_add(const char *suffix, esp_at_simple_handler_t handler);
+
+/**
+ * @brief Injeta uma linha completa no parser AT.
+ *
+ * A linha e processada como se tivesse sido recebida pela serial. Nao inclua
+ * CR/LF no final.
+ *
+ * @param[in] line Linha AT (ex: "AT+VER").
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_at_feed_line(const char *line);
+
+/**
+ * @brief Registra um sink para receber toda saida do terminal AT.
+ *
+ * A saida continua sendo escrita na UART; o sink recebe uma copia dos bytes.
+ *
+ * @param[in] sink Callback de saida.
+ * @param[in] ctx  Contexto de usuario.
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_at_register_output_sink(esp_at_output_sink_t sink, void *ctx);
+
+/**
+ * @brief Remove um sink previamente registrado.
+ *
+ * @param[in] sink Callback registrada.
+ * @param[in] ctx  Contexto associado.
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_at_unregister_output_sink(esp_at_output_sink_t sink, void *ctx);
 
 /* ======================================================================== */
 /* Saída — funções de escrita                                               */
