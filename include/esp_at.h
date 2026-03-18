@@ -1,8 +1,8 @@
 /**
  * @file    esp_at.h
- * @brief   Interface de comandos AT via UART para família ESP32.
+ * @brief   Interface de comandos AT via UART ou USB Serial/JTAG para família ESP32.
  *
- * Implementa um parser de linha AT sobre UART0 com echo local,
+ * Implementa um parser de linha AT sobre um transporte serial com echo local,
  * suporte a backspace, registro dinâmico de comandos e saída colorida
  * via tokens ANSI de concatenação em tempo de compilação.
  *
@@ -40,6 +40,7 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include "esp_err.h"
@@ -124,7 +125,7 @@ typedef void (*esp_at_output_sink_t)(const char *data, size_t len, void *ctx);
  * @return ESP_ERR_INVALID_STATE Já inicializado.
  * @return Outros                Erros da camada UART (esp_err_t).
  */
-esp_err_t esp_at_init(void);
+esp_err_t esp_at_init(bool log_enabled);
 
 /* ======================================================================== */
 /* Registro de comandos                                                      */
@@ -152,6 +153,25 @@ esp_err_t esp_at_init(void);
 esp_err_t esp_at_register_cmd(const char *cmd, at_handler_t handler);
 
 /**
+ * @brief Registra um comando AT com exemplo opcional para o HELP.
+ *
+ * @param[in] cmd      String do comando (ex: "AT+VER").
+ * @param[in] handler  Handler do comando.
+ * @param[in] example  Exemplo de uso exibido no HELP (opcional).
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_at_register_cmd_example(const char *cmd, at_handler_t handler, const char *example);
+
+/**
+ * @brief Remove um comando AT previamente registrado.
+ *
+ * @param[in] cmd String completa do comando (ex: "AT+VER").
+ * @return ESP_OK em sucesso.
+ * @return ESP_ERR_NOT_FOUND se o comando nao existir.
+ */
+esp_err_t esp_at_unregister_cmd(const char *cmd);
+
+/**
  * @brief Registra comando no formato simplificado "AT+<suffix>".
  *
  * Exemplo:
@@ -166,6 +186,16 @@ esp_err_t esp_at_register_cmd(const char *cmd, at_handler_t handler);
  * @return ESP_OK em sucesso.
  */
 esp_err_t esp_at_add(const char *suffix, esp_at_simple_handler_t handler);
+
+/**
+ * @brief Registra comando simplificado com exemplo opcional para o HELP.
+ *
+ * @param[in] suffix   Sufixo sem "AT+" ou comando completo.
+ * @param[in] handler  Callback sem parametros.
+ * @param[in] example  Exemplo de uso exibido no HELP (opcional).
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_at_add_example(const char *suffix, esp_at_simple_handler_t handler, const char *example);
 
 /**
  * @brief Injeta uma linha completa no parser AT.
@@ -197,6 +227,11 @@ esp_err_t esp_at_register_output_sink(esp_at_output_sink_t sink, void *ctx);
  * @return ESP_OK em sucesso.
  */
 esp_err_t esp_at_unregister_output_sink(esp_at_output_sink_t sink, void *ctx);
+
+/**
+ * @brief Informa se o subsistema AT ja foi inicializado.
+ */
+bool esp_at_is_initialized(void);
 
 /* ======================================================================== */
 /* Saída — funções de escrita                                               */
@@ -233,7 +268,7 @@ void at(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 /* Saída — log com timestamp                                                */
 /* ======================================================================== */
 
-/**
+/*
  * @brief  Log nível INFO com timestamp.
  * Formato: \033[0m[I HH:MM:SS] <mensagem>\033[0m\r\n
  * @param[in] fmt  String de formato (pode conter tokens de cor).
@@ -265,3 +300,4 @@ void AT_D(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #ifdef __cplusplus
 }
 #endif
+
