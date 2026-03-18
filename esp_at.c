@@ -73,6 +73,7 @@ typedef struct {
     const char              *example;
     at_handler_t             handler;
     esp_at_simple_handler_t  simple_handler;
+    bool                     help_visible;
 } at_cmd_t;
 
 typedef struct {
@@ -185,6 +186,9 @@ static void handle_at_help(const char *param)
     (void)param;
     AT(G "Comandos AT registrados:");
     for (int i = 0; i < s_cmd_count; i++) {
+        if (!s_table[i].help_visible) {
+            continue;
+        }
         if (s_table[i].example != NULL && s_table[i].example[0] != '\0') {
             AT(G "  %-16s " W "%s", s_table[i].cmd, s_table[i].example);
         } else {
@@ -603,6 +607,7 @@ esp_err_t esp_at_register_cmd_example(const char *cmd, at_handler_t handler, con
             s_table[idx].example = example;
             s_table[idx].handler = handler;
             s_table[idx].simple_handler = NULL;
+            s_table[idx].help_visible = true;
             return ESP_OK;
         }
         if (s_cmd_count >= AT_MAX_CMDS) return ESP_ERR_NO_MEM;
@@ -610,6 +615,7 @@ esp_err_t esp_at_register_cmd_example(const char *cmd, at_handler_t handler, con
         s_table[s_cmd_count].example        = example;
         s_table[s_cmd_count].handler        = handler;
         s_table[s_cmd_count].simple_handler = NULL;
+        s_table[s_cmd_count].help_visible   = true;
         s_cmd_count++;
         return ESP_OK;
     }
@@ -620,6 +626,7 @@ esp_err_t esp_at_register_cmd_example(const char *cmd, at_handler_t handler, con
         s_table[idx].example = example;
         s_table[idx].handler = handler;
         s_table[idx].simple_handler = NULL;
+        s_table[idx].help_visible = true;
         xSemaphoreGive(s_mutex);
         return ESP_OK;
     }
@@ -631,7 +638,24 @@ esp_err_t esp_at_register_cmd_example(const char *cmd, at_handler_t handler, con
     s_table[s_cmd_count].example        = example;
     s_table[s_cmd_count].handler        = handler;
     s_table[s_cmd_count].simple_handler = NULL;
+    s_table[s_cmd_count].help_visible   = true;
     s_cmd_count++;
+    xSemaphoreGive(s_mutex);
+    return ESP_OK;
+}
+
+esp_err_t esp_at_set_help_visible(const char *cmd, bool visible)
+{
+    if (!s_initialized) return ESP_ERR_INVALID_STATE;
+    if (cmd == NULL || cmd[0] == '\0') return ESP_ERR_INVALID_ARG;
+
+    xSemaphoreTake(s_mutex, portMAX_DELAY);
+    int idx = _find_cmd_index(cmd);
+    if (idx < 0) {
+        xSemaphoreGive(s_mutex);
+        return ESP_ERR_NOT_FOUND;
+    }
+    s_table[idx].help_visible = visible;
     xSemaphoreGive(s_mutex);
     return ESP_OK;
 }
@@ -693,6 +717,7 @@ esp_err_t esp_at_add_example(const char *suffix, esp_at_simple_handler_t handler
         s_table[idx].example = example;
         s_table[idx].handler = NULL;
         s_table[idx].simple_handler = handler;
+        s_table[idx].help_visible = true;
         xSemaphoreGive(s_mutex);
         return ESP_OK;
     }
@@ -706,6 +731,7 @@ esp_err_t esp_at_add_example(const char *suffix, esp_at_simple_handler_t handler
     s_table[s_cmd_count].example        = example;
     s_table[s_cmd_count].handler        = NULL;
     s_table[s_cmd_count].simple_handler = handler;
+    s_table[s_cmd_count].help_visible   = true;
     s_cmd_count++;
     xSemaphoreGive(s_mutex);
     return ESP_OK;

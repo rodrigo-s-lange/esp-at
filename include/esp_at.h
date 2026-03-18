@@ -163,6 +163,15 @@ esp_err_t esp_at_register_cmd(const char *cmd, at_handler_t handler);
 esp_err_t esp_at_register_cmd_example(const char *cmd, at_handler_t handler, const char *example);
 
 /**
+ * @brief Controla se um comando aparece em `AT+HELP`.
+ *
+ * @param[in] cmd     String completa do comando (ex: "AT+OTA").
+ * @param[in] visible TRUE para aparecer no help, FALSE para ocultar.
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_at_set_help_visible(const char *cmd, bool visible);
+
+/**
  * @brief Remove um comando AT previamente registrado.
  *
  * @param[in] cmd String completa do comando (ex: "AT+VER").
